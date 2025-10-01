@@ -19,4 +19,8 @@ public class Doctor extends Persona {
     public String toString() {
         return "Doctor: " + nombre + " (" + especialidad + ")";
     }
+    @Override
+    public void mostrarInfo() {
+        System.out.println(this.toString());
+    }
 }

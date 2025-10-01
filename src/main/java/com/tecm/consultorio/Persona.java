@@ -13,4 +13,5 @@ public abstract class Persona {
     public int getEdad() { return edad; }
 
     public abstract String getRol(); // polimórfico
+    public abstract void mostrarInfo();
 }
