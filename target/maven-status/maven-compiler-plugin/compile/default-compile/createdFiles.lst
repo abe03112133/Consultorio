@@ -1,6 +1,7 @@
 com\tecm\consultorio\SistemaCitasConsultorio.class
 com\tecm\consultorio\Persona.class
 com\tecm\consultorio\Paciente.class
-com\tecm\consultorio\Cita.class
 com\tecm\consultorio\Doctor.class
+com\tecm\consultorio\Cita.class
 com\tecm\consultorio\Registro.class
+com\tecm\consultorio\Usuario.class
