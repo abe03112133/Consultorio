@@ -12,13 +12,13 @@ public class SistemaCitasConsultorio {
     private static List<Paciente> pacientes = new ArrayList<>();
     private static List<Cita> citas = new ArrayList<>();
     private static List<Usuario> usuarios = new ArrayList<>();
-
+    // funcion para imitar limpiar la pantalla
     public static void clearScreen(int c) {
         for (int i = 0; i < c; i++) {
             System.out.println();
         }
     }
-
+    // funcion para simular un paro en el programa
     public static void pause() {
         System.out.println("\nPresione ENTER para continuar...");
         Scanner sc = new Scanner(System.in);
@@ -30,55 +30,54 @@ public class SistemaCitasConsultorio {
         cargarDoctores();
         cargarPacientes();
         cargarCitas();
+        while (true) {
+            clearScreen(10);
+            System.out.println("===== Sistema de Citas del Consultorio =====");
+            System.out.print("Ingrese usuario: ");
+            String usuarioIngresado = sc.nextLine();
+            System.out.print("Ingrese contraseña: ");
+            String contrasenaIngresada = sc.nextLine();
+            // Buscar usuario
+            Usuario user = usuarios.stream()
+                    .filter(u -> u.getNombreUsuario().equalsIgnoreCase(usuarioIngresado))
+                    .findFirst()
+                    .orElse(null);
 
-        System.out.println("===== Sistema de Citas del Consultorio =====");
-
-        System.out.print("Ingrese usuario: ");
-        String usuarioIngresado = sc.nextLine();
-
-        System.out.print("Ingrese contraseña: ");
-        String contrasenaIngresada = sc.nextLine();
-
-// Buscar usuario
-        Usuario user = usuarios.stream()
-                .filter(u -> u.getNombreUsuario().equalsIgnoreCase(usuarioIngresado))
-                .findFirst()
-                .orElse(null);
-
-        if (user == null) {
-            System.out.println("Usuario no encontrado.");
-            return;
-        }
-
-// Si la contraseña es "pendiente", pedir nueva
-        if (user.getContrasena().equals("pendiente")) {
-            System.out.println("Primera vez ingresando, por favor cree su contraseña:");
-            String nuevaPass = sc.nextLine();
-            user.setContrasena(nuevaPass);
-            guardarUsuarios();
-            System.out.println("Contraseña registrada. Inicie sesion nuevamente.");
-            return;
-        }
-
-// Validar login
-        if (user.validarLogin(contrasenaIngresada)) {
-            switch (user.getRol()) {
-                case "admin" ->
-                    menuAdmin();
-                case "doctor" ->
-                    menuDoctor();
-                case "cliente" ->
-                    menuCliente();
+            if (user == null) {
+                System.out.println("Usuario no encontrado.");pause();
+                return;
             }
-        } else {
-            System.out.println("Contraseña incorrecta.");
+
+            // Si la contraseña es "pendiente", pedir nueva
+            if (user.getContrasena().equals("pendiente")) {
+                clearScreen(50);
+                System.out.println("Primera vez ingresando, por favor cree su contraseña:");
+                String nuevaPass = sc.nextLine();
+                user.setContrasena(nuevaPass);
+                guardarUsuarios();
+                System.out.println("Contraseña registrada. Inicie sesion nuevamente.");
+                continue;
+            }
+            // Validar login
+            if (user.validarLogin(contrasenaIngresada)) {
+                switch (user.getRol()) {
+                    case "admin" ->
+                        menuAdmin();
+                    case "doctor" ->
+                        menuDoctor();
+                    case "cliente" ->
+                        menuCliente();
+                }
+            } else {
+                System.out.println("Contraseña incorrecta.");pause();
+            }
         }
     }
 
-    // menu
+    // menu interactivo
     private static void menuAdmin() {
         int opcion;
-        do {
+        do {clearScreen(10);
             System.out.println("\n--- Menu Admin ---");
             System.out.println("1. Registrar Doctor");
             System.out.println("2. Registrar Paciente");
@@ -89,7 +88,6 @@ public class SistemaCitasConsultorio {
             System.out.println("0. Salir");
             System.out.print("Opcion: ");
             opcion = leerEntero();
-
             switch (opcion) {
                 case 1 ->
                     altaDoctor();
@@ -109,7 +107,7 @@ public class SistemaCitasConsultorio {
 
     private static void menuDoctor() {
         int opcion;
-        do {
+        do {clearScreen(10);
             System.out.println("\n--- Menu Doctor ---");
             System.out.println("1. Registrar Paciente");
             System.out.println("2. Crear Cita");
@@ -117,7 +115,6 @@ public class SistemaCitasConsultorio {
             System.out.println("0. Salir");
             System.out.print("Opcion: ");
             opcion = leerEntero();
-
             switch (opcion) {
                 case 1 ->
                     altaPaciente();
@@ -129,29 +126,26 @@ public class SistemaCitasConsultorio {
         } while (opcion != 0);
     }
 
-    private static void menuCliente() {
+    private static void menuCliente() {clearScreen(10);
         System.out.println("\n--- Citas de Cliente ---");
         listarCitas();
     }
 
     // Metodos del menu
-    private static void altaDoctor() {
+    private static void altaDoctor() {clearScreen(10);
         System.out.print("Ingrese nombre del Doctor: ");
         String nombre = sc.nextLine();
-
         System.out.print("Ingrese edad del Doctor: ");
         int edad = leerEntero();
-
         System.out.print("Ingrese especialidad: ");
         String especialidad = sc.nextLine();
-
         Doctor d = new Doctor(nombre, edad, especialidad);
         doctores.add(d);
         guardarDoctores();
-        System.out.println(" Doctor registrado: " + d);
+        System.out.println(" Doctor registrado: \n\n" + d);pause();
     }
 
-    private static void altaPaciente() {
+    private static void altaPaciente() {clearScreen(10);
         System.out.print("Ingrese nombre del Paciente: ");
         String nombre = sc.nextLine();
 
@@ -164,12 +158,12 @@ public class SistemaCitasConsultorio {
         Paciente p = new Paciente(nombre, edad, historial);
         pacientes.add(p);
         guardarPacientes();
-        System.out.println("Paciente registrado: " + p);
+        System.out.println("Paciente registrado: \n\n" + p);pause();
     }
 
-    private static void crearCita() {
+    private static void crearCita() {clearScreen(10);
         if (doctores.isEmpty() || pacientes.isEmpty()) {
-            System.out.println(" Debe haber al menos un Doctor y un Paciente registrados.");
+            System.out.println(" Debe haber al menos un Doctor y un Paciente registrados. \n\n");pause();
             return;
         }
 
@@ -191,7 +185,7 @@ public class SistemaCitasConsultorio {
         Cita c = new Cita(doctores.get(idxDoc), pacientes.get(idxPac), fecha);
         citas.add(c);
         guardarCitas();
-        System.out.println(" Cita registrada: " + c);
+        System.out.println(" Cita registrada: \n\n" + c);pause();
     }
 
     private static void listarCitas() {
@@ -202,7 +196,7 @@ public class SistemaCitasConsultorio {
             for (Cita c : citas) {
                 System.out.println(c);
             }
-        }
+        }pause();
     }
 
     private static void listarDoctores() {
@@ -213,7 +207,7 @@ public class SistemaCitasConsultorio {
             for (Doctor d : doctores) {
                 System.out.println(d);
             }
-        }
+        }pause();
     }
 
     private static void listarPacientes() {
@@ -224,7 +218,7 @@ public class SistemaCitasConsultorio {
             for (Paciente p : pacientes) {
                 System.out.println(p);
             }
-        }
+        }pause();
     }
 
     // BD 
@@ -271,7 +265,7 @@ public class SistemaCitasConsultorio {
 
     private static void cargarDoctores() {
         doctores.clear();
-        try (BufferedReader br = new BufferedReader(new FileReader("doctores.csv"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader("db/doctores.csv"))) {
             String linea;
             while ((linea = br.readLine()) != null) {
                 String[] datos = linea.split(",");
@@ -289,7 +283,7 @@ public class SistemaCitasConsultorio {
 
     private static void cargarPacientes() {
         pacientes.clear();
-        try (BufferedReader br = new BufferedReader(new FileReader("pacientes.csv"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader("db/pacientes.csv"))) {
             String linea;
             while ((linea = br.readLine()) != null) {
                 String[] datos = linea.split(",");
@@ -307,7 +301,7 @@ public class SistemaCitasConsultorio {
 
     private static void cargarCitas() {
         citas.clear();
-        try (BufferedReader br = new BufferedReader(new FileReader("citas.csv"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader("db/citas.csv"))) {
             String linea;
             while ((linea = br.readLine()) != null) {
                 String[] datos = linea.split(",");
@@ -337,7 +331,7 @@ public class SistemaCitasConsultorio {
 
     private static void cargarUsuarios() {
         usuarios.clear();
-        File f = new File("usuarios.csv");
+        File f = new File("db/usuarios.csv");
         if (!f.exists()) {
             System.out.println("Archivo usuarios.csv no encontrado. Se creara al guardar usuarios.");
         } else {
