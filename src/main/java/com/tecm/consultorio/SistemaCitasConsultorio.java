@@ -1,17 +1,23 @@
 package com.tecm.consultorio;
 
 import java.util.*;
+import java.io.*;
 
 public class SistemaCitasConsultorio {
+
     private static Scanner sc = new Scanner(System.in);
 
     // Listas para almacenar la información
     private static List<Doctor> doctores = new ArrayList<>();
     private static List<Paciente> pacientes = new ArrayList<>();
     private static List<Cita> citas = new ArrayList<>();
-    
 
     public static void main(String[] args) {
+        
+        cargarDoctores();
+        cargarPacientes();
+        cargarCitas();
+
         System.out.println("===== Sistema de Citas del Consultorio =====");
 
         System.out.print("Ingrese usuario: ");
@@ -46,10 +52,14 @@ public class SistemaCitasConsultorio {
             opcion = leerEntero();
 
             switch (opcion) {
-                case 1 -> altaDoctor();
-                case 2 -> altaPaciente();
-                case 3 -> crearCita();
-                case 4 -> listarCitas();
+                case 1 ->
+                    altaDoctor();
+                case 2 ->
+                    altaPaciente();
+                case 3 ->
+                    crearCita();
+                case 4 ->
+                    listarCitas();
             }
         } while (opcion != 0);
     }
@@ -66,9 +76,12 @@ public class SistemaCitasConsultorio {
             opcion = leerEntero();
 
             switch (opcion) {
-                case 1 -> altaPaciente();
-                case 2 -> crearCita();
-                case 3 -> listarCitas();
+                case 1 ->
+                    altaPaciente();
+                case 2 ->
+                    crearCita();
+                case 3 ->
+                    listarCitas();
             }
         } while (opcion != 0);
     }
@@ -79,7 +92,6 @@ public class SistemaCitasConsultorio {
     }
 
     // Metodos del menu
-
     private static void altaDoctor() {
         System.out.print("Ingrese nombre del Doctor: ");
         String nombre = sc.nextLine();
@@ -92,6 +104,7 @@ public class SistemaCitasConsultorio {
 
         Doctor d = new Doctor(nombre, edad, especialidad);
         doctores.add(d);
+        guardarDoctores(); 
         System.out.println(" Doctor registrado: " + d);
     }
 
@@ -107,6 +120,7 @@ public class SistemaCitasConsultorio {
 
         Paciente p = new Paciente(nombre, edad, historial);
         pacientes.add(p);
+        guardarPacientes();
         System.out.println("Paciente registrado: " + p);
     }
 
@@ -133,6 +147,7 @@ public class SistemaCitasConsultorio {
 
         Cita c = new Cita(doctores.get(idxDoc), pacientes.get(idxPac), fecha);
         citas.add(c);
+        guardarCitas();
         System.out.println(" Cita registrada: " + c);
     }
 
@@ -147,7 +162,7 @@ public class SistemaCitasConsultorio {
         }
     }
 
-    // ===================== UTILIDAD =====================
+    // ===================== BD =====================
     private static int leerEntero() {
         while (true) {
             try {
@@ -158,5 +173,100 @@ public class SistemaCitasConsultorio {
             }
         }
     }
-}
 
+    private static void guardarDoctores() {
+        try (PrintWriter pw = new PrintWriter(new FileWriter("doctores.csv"))) {
+            for (Doctor d : doctores) {
+                pw.println(d.getNombre() + "," + d.getEdad() + "," + d.getEspecialidad());
+            }
+        } catch (IOException e) {
+            System.out.println("Error al guardar doctores: " + e.getMessage());
+        }
+    }
+
+    private static void guardarPacientes() {
+        try (PrintWriter pw = new PrintWriter(new FileWriter("pacientes.csv"))) {
+            for (Paciente p : pacientes) {
+                pw.println(p.getNombre() + "," + p.getEdad() + "," + p.getHistorialMedico());
+            }
+        } catch (IOException e) {
+            System.out.println("Error al guardar pacientes: " + e.getMessage());
+        }
+    }
+
+    private static void guardarCitas() {
+        try (PrintWriter pw = new PrintWriter(new FileWriter("citas.csv"))) {
+            for (Cita c : citas) {
+                pw.println(c.getFecha() + "," + c.getDoctor().getNombre() + "," + c.getPaciente().getNombre());
+            }
+        } catch (IOException e) {
+            System.out.println("Error al guardar citas: " + e.getMessage());
+        }
+    }
+
+    private static void cargarDoctores() {
+        doctores.clear();
+        try (BufferedReader br = new BufferedReader(new FileReader("doctores.csv"))) {
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                String[] datos = linea.split(",");
+                if (datos.length == 3) {
+                    String nombre = datos[0];
+                    int edad = Integer.parseInt(datos[1]);
+                    String especialidad = datos[2];
+                    doctores.add(new Doctor(nombre, edad, especialidad));
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Archivo de doctores no encontrado, se creará nuevo.");
+        }
+    }
+
+    private static void cargarPacientes() {
+        pacientes.clear();
+        try (BufferedReader br = new BufferedReader(new FileReader("pacientes.csv"))) {
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                String[] datos = linea.split(",");
+                if (datos.length == 3) {
+                    String nombre = datos[0];
+                    int edad = Integer.parseInt(datos[1]);
+                    String historial = datos[2];
+                    pacientes.add(new Paciente(nombre, edad, historial));
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Archivo de pacientes no encontrado, se creará nuevo.");
+        }
+    }
+
+    private static void cargarCitas() {
+        citas.clear();
+        try (BufferedReader br = new BufferedReader(new FileReader("citas.csv"))) {
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                String[] datos = linea.split(",");
+                if (datos.length == 3) {
+                    String fecha = datos[0];
+                    String nombreDoc = datos[1];
+                    String nombrePac = datos[2];
+
+                    // buscar objetos existentes
+                    Doctor doctor = doctores.stream()
+                            .filter(d -> d.getNombre().equals(nombreDoc))
+                            .findFirst().orElse(null);
+                    Paciente paciente = pacientes.stream()
+                            .filter(p -> p.getNombre().equals(nombrePac))
+                            .findFirst().orElse(null);
+
+                    if (doctor != null && paciente != null) {
+                        citas.add(new Cita(doctor, paciente, fecha));
+                    }
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Archivo de citas no encontrado, se creará nuevo.");
+        }
+    }
+
+}
