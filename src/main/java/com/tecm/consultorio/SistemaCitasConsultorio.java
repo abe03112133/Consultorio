@@ -128,7 +128,7 @@ public class SistemaCitasConsultorio {
 
     private static void menuCliente() {clearScreen(10);
         System.out.println("\n--- Citas de Cliente ---");
-        listarCitas();
+        listarCitas();pause();
     }
 
     // Metodos del menu
@@ -373,7 +373,7 @@ public class SistemaCitasConsultorio {
 
     //  Guardar usuarios 
     private static void guardarUsuarios() {
-        File f = new File("usuarios.csv");
+        File f = new File("db/usuarios.csv");
         try (PrintWriter pw = new PrintWriter(new FileWriter(f))) {
             pw.println("nombreUsuario,rol,contrasena");
             for (Usuario u : usuarios) {
